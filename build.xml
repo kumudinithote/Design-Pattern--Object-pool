@@ -1,0 +1,72 @@
+<project name="numberPlay" default="compile_all" basedir="..">
+
+  <property name="BUILD.compiler"       value="modern"/>
+  <property name="src"                  value="src"/>
+  <property name="BUILD"                value="src/BUILD"/>
+  <property name="classes"              value="${BUILD}/classes"/>
+
+  <target name="all" depends="compile_all"/>
+
+  <target name="compile_all"
+          depends="numberPlay"/>
+
+  <target name="clean">
+       <delete dir="${BUILD}"/>
+  </target>
+
+  <!-- Prepare target directories -->
+  <target name="prepare">
+        <mkdir dir="${BUILD}"/>
+        <mkdir dir="${classes}"/>
+  </target>
+
+ <target name="jar">
+        <mkdir dir="${BUILD}/jar"/>
+        <jar destfile="${BUILD}/jar/numberPlay.jar" basedir="${BUILD}/classes">
+            <manifest>
+                <attribute name="Main-Class" value="numberPlay.driver.Driver"/>
+            </manifest>
+        </jar>
+    </target>
+
+  <!-- ** means all subdirectories as well -->
+  <!-- * means all files in the current directory -->
+  <!-- for just java files use *.java -->
+
+  <target name="numberPlay" depends="prepare">
+    <javac includeantruntime="false" srcdir="${src}"
+	           includes="numberPlay/**"
+           excludes="**/package.html"
+           destdir="${classes}"
+           classpath="${classes}"
+           debug="on"
+           optimize="on"
+           deprecation="off"/>
+  </target>
+
+<target name="run-prime-detector" depends="jar">
+   	<java fork="true" classname="numberPlay.driver.Driver">
+	    <classpath>
+	        <pathelement location="${BUILD}/jar/numberPlay.jar" />
+	    </classpath>
+		<arg value="${inputFile}"/> <!-- input file -->
+		<arg value="${numThreads}"/> <!-- Number of threads -->
+		<arg value="${capacity}"/> <!-- Capacity of DS -->
+	    <arg value="${persisterServiceIp}"/> <!-- persisterServiceIp -->
+	    <arg value="${persisterServicePort}"/> <!-- persisterServicePort -->
+	    <arg value="${debugValue}"/> <!-- debugMode -->
+    </java>	
+</target>
+
+	<target name="run-persister-service" depends="jar">
+	   	<java fork="true" classname="numberPlay.driver.PersisterService">
+		    <classpath>
+		        <pathelement location="${BUILD}/jar/numberPlay.jar" />
+		    </classpath>
+		    <arg value="${port}"/> <!-- persisterServiceIp -->
+		    <arg value="${outputFile}"/> <!-- persisterServicePort -->
+		    <arg value="${debugValue}"/> <!-- debugMode -->
+	    </java>	
+	</target>
+	
+</project>
